@@ -30,5 +30,5 @@ output "REST" {
   value = tonumber(var.instance_count) >= 1 ? " REST Proxy: curl  http://${join(",",formatlist("%s", aws_instance.rbac-demo.*.public_ip),)}:8082" : "Confluent Cloud Platform on AWS is disabled"
 }  
 output "LDAP" {
-  value = tonumber(var.instance_count) >= 1 ? " ldapsearch -D \"cn=Hubert J. Farnsworth\" -w professor -p 389 -h ${join(",",formatlist("%s", aws_instance.rbac-demo.*.public_ip),)} -b \"dc=planetexpress,dc=com\" -s sub \"(objectclass=*)\"" : "Confluent Cloud Platform on AWS is disabled"
+  value = tonumber(var.instance_count) >= 1 ? " ldapsearch -D \"cn=Hubert J. Farnsworth,ou=people,dc=planetexpress,dc=com\" -w professor -p 389 -h ${join(",",formatlist("%s", aws_instance.rbac-demo.*.public_ip),)} -b \"dc=planetexpress,dc=com\" -s sub \"(objectclass=*)\"" : "Confluent Cloud Platform on AWS is disabled"
 }  
