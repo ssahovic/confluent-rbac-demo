@@ -3,6 +3,7 @@ yum update -y
 yum install wget -y
 yum install unzip -y
 yum install java-1.8.0-openjdk-devel.x86_64 -y
+yum install openldap-clients
 # install docker
 yum install -y docker
 # set environment
@@ -38,13 +39,13 @@ rm confluent-5.3.1-2.12.tar.gz
 # install RBAC Demo
 wget ${confluent_rbac_demo}
 unzip master.zip
-chown ec2-user:ec2-user -R /home/ec2-user/software/confluent-rbac-demo/
+chown ec2-user:ec2-user -R /home/ec2-user/software/confluent-rbac-demo-master/
 rm master.zip
-chown ec2-user:ec2-user -R confluent-rbac-demo/*
-cd confluent-rbac-demo/
+chown ec2-user:ec2-user -R confluent-rbac-demo-master/*
+cd confluent-rbac-demo-master/
 rm -r terraform/*
 # set PUBLIC IP and change the Data in docker-compose.yaml
-cd rbac-docker/
+cd /home/ec2-user/software/confluent-rbac-demo-master/rbac-docker
 PUBIP=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 SCRIPT1="sed -i 's/CONNECT_REST_ADVERTISED_HOST_NAME: connect/CONNECT_REST_ADVERTISED_HOST_NAME: $PUBIP/g' docker-compose.yml;"
 SCRIPT2="sed -i 's/CONTROL_CENTER_KSQL_KSQL1_ADVERTISED_URL: http:\/\/localhost:8088/CONTROL_CENTER_KSQL_KSQL1_ADVERTISED_URL: http:\/\/$PUBIP:8088/g' docker-compose.yml;"
