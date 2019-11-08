@@ -496,8 +496,8 @@ services:
       CONTROL_CENTER_REST_AUTHENTICATION_METHOD: BEARER
       CONTROL_CENTER_AUTH_BEARER_PUBLIC_KEY_PATH: /tmp/conf/public.pem
       
-      CONTROL_CENTER_METADATA_USERNAME: hermes
-      CONTROL_CENTER_METADATA_PASSWORD: hermes
+      CONTROL_CENTER_METADATA_USERNAME: professor
+      CONTROL_CENTER_METADATA_PASSWORD: professor
       CONTROL_CENTER_METADATA_URLS: http://broker:8090
       
       CONTROL_CENTER_STREAMS_SECURITY_PROTOCOL: SASL_PLAINTEXT
@@ -508,6 +508,6 @@ services:
       CONTROL_CENTER_STREAMS_SASL_JAAS_CONFIG: |
                                                 \
                                                 org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
-                                                username="hermes" \
-                                                password="hermes" \
+                                                username="professor" \
+                                                password="professor" \
                                                 metadataServerUrls="http://broker:8090";

@@ -13,11 +13,18 @@ fi
 
 ################################## SETUP VARIABLES #############################
 MDS_URL=http://localhost:8090
+# Standard connect cluster id
+# get connect cluster id curl -u fry:fry http://localhost:8083/permissions
 CONNECT=connect-cluster
+# standard SR cluster id curl -u leela:leela http://localhost:8081/permissions
 SR=schema-registry
 KSQL=ksql-cluster
+# standard ksql cluster id curl -u professor:professor "http://localhost:8088/info" | jq '.'
+KSQLSERVICEID=default_
+# C3 cluster id, is not used
 C3=c3-cluster
 
+# User
 SUPER_USER=professor
 SUPER_USER_PASSWORD=professor
 SUPER_USER_PRINCIPAL="User:$SUPER_USER"
@@ -75,7 +82,7 @@ confluent iam rolebinding create \
     --principal $SUPER_USER_PRINCIPAL \
     --role SystemAdmin \
     --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --ksql-cluster-id $KSQL
+    --ksql-cluster-id $KSQLSERVICEID
 
 ################################### SCHEMA REGISTRY ###################################
 echo "Creating Schema Registry role bindings"
@@ -133,25 +140,25 @@ confluent iam rolebinding create \
     --role ResourceOwner \
     --resource KsqlCluster:ksql-cluster \
     --kafka-cluster-id $KAFKA_CLUSTER_ID \
-    --ksql-cluster-id $KSQL
+    --ksql-cluster-id $KSQLSERVICEID
 
 confluent iam rolebinding create \
     --principal $KSQL_PRINCIPAL \
     --role ResourceOwner \
-    --resource Group:_confluent-ksql-${KSQL} \
+    --resource Group:_confluent-ksql-${KSQLSERVICEID} \
     --prefix \
     --kafka-cluster-id $KAFKA_CLUSTER_ID
 
 confluent iam rolebinding create \
     --principal $KSQL_PRINCIPAL \
     --role ResourceOwner \
-    --resource Topic:_confluent-ksql-${KSQL}_command_topic \
+    --resource Topic:_confluent-ksql-${KSQLSERVICEID}_command_topic \
     --kafka-cluster-id $KAFKA_CLUSTER_ID
 
 confluent iam rolebinding create \
     --principal $KSQL_PRINCIPAL \
     --role ResourceOwner \
-    --resource Topic:${KSQL}ksql_processing_log \
+    --resource Topic:${KSQLSERVICEID}ksql_processing_log \
     --kafka-cluster-id $KAFKA_CLUSTER_ID
 
 ################################### C3 ###################################
