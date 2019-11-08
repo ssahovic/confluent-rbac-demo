@@ -38,6 +38,9 @@ tar -xvf confluent-5.3.1-2.12.tar.gz
 chown ec2-user:ec2-user -R confluent-5.3.1/*
 rm confluent-5.3.1-2.12.tar.gz
 
+export PATH=/bin:/usr/local/bin:/home/ec2-user/software/confluent-5.3.1/bin:\$PATH
+export CONFLUENT_HOME=/home/ec2-user/software/confluent-5.3.1
+
 # install RBAC Demo
 wget ${confluent_rbac_demo}
 unzip master.zip
@@ -46,6 +49,7 @@ rm master.zip
 chown ec2-user:ec2-user -R confluent-rbac-demo-master/*
 cd /home/ec2-user/software/confluent-rbac-demo-master
 rm -r terraform/
+
 
 # set PUBLIC IP and change the Data in docker-compose.yaml
 cd /home/ec2-user/software/confluent-rbac-demo-master/rbac-docker
@@ -61,10 +65,12 @@ bash -c "$SCRIPT3"
 bash -c "$SCRIPT4"
 
 # config bash_profile for ec2-user
-echo "export PATH=/usr/local/bin:/home/ec2-user/software/confluent-5.3.1/bin:\$PATH" >> /home/ec2-user/.bash_profile
+echo "export PATH=/usr/local/bin:/home/ec2-user/software/confluent-5.3.1/bin:\$PATH
+export CONFLUENT_HOME=/home/ec2-user/software/confluent-5.3.1" >> /home/ec2-user/.bash_profile
 chown ec2-user:ec2-user /home/ec2-user/.bash_profile
-echo "export PATH=/usr/local/bin:/home/ec2-user/software/confluent-5.3.1/bin:\$PATH" >> /root/.bash_profile
+echo "export PATH=/bin:/usr/local/bin:/home/ec2-user/software/confluent-5.3.1/bin:\$PATH
+export CONFLUENT_HOME=/home/ec2-user/software/confluent-5.3.1" >> /root/.bashrc
 
 # Start environment
 /home/ec2-user/software/confluent-rbac-demo-master/rbac-docker/confluent-start.sh
-
+chown ec2-user:ec2-user -R conf/

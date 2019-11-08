@@ -1,4 +1,4 @@
-# Running RBAC on docker-compose in AWS
+# Running RBAC on docker-compose in AWS - Hands-on Workshop
 
 This docker-compose based setup includes:
 
@@ -24,7 +24,7 @@ The AWS Compute instance will everything prepare to run this demo, including
 - VPCs and Security Group setup
 
 ### Optional
-Install on your desktion Apache Directory Studio to create and modify LDAP users in openLDAP. [Download Apache Directory Studio](https://directory.apache.org/studio/downloads.html)
+Install on your local machine Apache Directory Studio to create and modify LDAP users in openLDAP. [Download Apache Directory Studio](https://directory.apache.org/studio/downloads.html)
 Apache Directory Studio is important if you want to add user/group in openLDAP or modify users or groups.
 
 ## Image Versions
