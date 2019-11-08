@@ -3,11 +3,11 @@
 ################################## GET KAFKA CLUSTER ID ########################
 ZK_CONTAINER=zookeeper
 ZK_PORT=2181
-echo "Retrieving Kafka cluster id from docker-container '$ZK_CONTAINER' port '$ZK_PORT'"
+echo "Retrieving Kafka cluster id from docker-container '$ZK_CONTAINER' port '$ZK_PORT'" >> /home/ec2-user/rbac.log
 KAFKA_CLUSTER_ID=$(docker exec -it $ZK_CONTAINER zookeeper-shell localhost:$ZK_PORT get /cluster/id 2> /dev/null | grep \"version\" | jq -r .id)
-echo "KAFKA_CLUSTER_ID: $KAFKA_CLUSTER_ID"
+echo "KAFKA_CLUSTER_ID: $KAFKA_CLUSTER_ID" >> /home/ec2-user/rbac.log
 if [ -z "$KAFKA_CLUSTER_ID" ]; then 
-    echo "Failed to retrieve kafka cluster id from zookeeper"
+    echo "Failed to retrieve kafka cluster id from zookeeper" >> /home/ec2-user/rbac.log
     exit 1
 fi
 
@@ -36,7 +36,7 @@ C3_PRINCIPAL="User:hermes"
 
 # Log into MDS
 if [[ $(type expect 2>&1) =~ "not found" ]]; then
-  echo "'expect' is not found. Install 'expect' and try again"
+  echo "'expect' is not found. Install 'expect' and try again" >> /home/ec2-user/rbac.log
   exit 1
 fi
 echo -e "\n# Login"
@@ -54,12 +54,12 @@ END
 )
 echo "$OUTPUT"
 if [[ ! "$OUTPUT" =~ "Logged in as" ]]; then
-  echo "Failed to log into your Metadata Server.  Please check all parameters and run again"
+  echo "Failed to log into your Metadata Server.  Please check all parameters and run again" >> /home/ec2-user/rbac.log
   exit 1
 fi
 
 ################################### SETUP SUPERUSER ###################################
-echo "Creating Super User role bindings"
+echo "Creating Super User role bindings" >> /home/ec2-user/rbac.log
 
 confluent iam rolebinding create \
     --principal $SUPER_USER_PRINCIPAL  \
@@ -85,7 +85,7 @@ confluent iam rolebinding create \
     --ksql-cluster-id $KSQLSERVICEID
 
 ################################### SCHEMA REGISTRY ###################################
-echo "Creating Schema Registry role bindings"
+echo "Creating Schema Registry role bindings" >> /home/ec2-user/rbac.log
 
 # SecurityAdmin on SR cluster itself
 confluent iam rolebinding create \
@@ -105,7 +105,7 @@ do
 done
 
 ################################### CONNECT ###################################
-echo "Creating Connect role bindings"
+echo "Creating Connect role bindings" >> /home/ec2-user/rbac.log
 
 # SecurityAdmin on the connect cluster itself
 confluent iam rolebinding create \
@@ -133,7 +133,7 @@ do
 done
 
 ################################### KSQL ###################################
-echo "Creating KSQL role bindings"
+echo "Creating KSQL role bindings" >> /home/ec2-user/rbac.log
 
 confluent iam rolebinding create \
     --principal $KSQL_PRINCIPAL \
@@ -162,7 +162,7 @@ confluent iam rolebinding create \
     --kafka-cluster-id $KAFKA_CLUSTER_ID
 
 ################################### C3 ###################################
-echo "Creating C3 role bindings"
+echo "Creating C3 role bindings" >> /home/ec2-user/rbac.log
 
 # C3 only needs SystemAdmin on the kafka cluster itself
 confluent iam rolebinding create \
@@ -173,18 +173,18 @@ confluent iam rolebinding create \
 
 ######################### print cluster ids and users again to make it easier to copypaste ###########
 
-echo "Finished setting up role bindings"  > ./setup.txt
-echo "    kafka cluster id: $KAFKA_CLUSTER_ID"  >> ./setup.txt
-echo "    connect cluster id: $CONNECT"  >> ./setup.txt
-echo "    schema registry cluster id: $SR"  >> ./setup.txt
-echo "    ksql cluster id: $KSQL"  >> ./setup.txt
+echo "Finished setting up role bindings"  >> /home/ec2-user/rbac.log
+echo "    kafka cluster id: $KAFKA_CLUSTER_ID"  >> /home/ec2-user/rbac.log
+echo "    connect cluster id: $CONNECT"  >> /home/ec2-user/rbac.log
+echo "    schema registry cluster id: $SR"  >> /home/ec2-user/rbac.log
+echo "    ksql cluster id: $KSQLSERVICEID"  >> /home/ec2-user/rbac.log
 echo
-echo "    super user account: $SUPER_USER_PRINCIPAL"  >> ./setup.txt
-echo "    connect service account: $CONNECT_PRINCIPAL"  >> ./setup.txt
-echo "    schema registry service account: $SR_PRINCIPAL"  >> ./setup.txt
-echo "    KSQL service account: $KSQL_PRINCIPAL"  >> ./setup.txt
-echo "    C3 service account: $C3_PRINCIPAL"  >> ./setup.txt
+echo "    super user account: $SUPER_USER_PRINCIPAL" >> /home/ec2-user/rbac.log
+echo "    connect service account: $CONNECT_PRINCIPAL" >> /home/ec2-user/rbac.log
+echo "    schema registry service account: $SR_PRINCIPAL" >> /home/ec2-user/rbac.log
+echo "    KSQL service account: $KSQL_PRINCIPAL"  >> /home/ec2-user/rbac.log
+echo "    C3 service account: $C3_PRINCIPAL"  >> ./home/ec2-user/rbac.log
 
 echo
-echo "To set service IDs as environment variables paste/run this in your shell:"  >> ./setup.txt
-echo "    export KAFKA_ID=$KAFKA_CLUSTER_ID ; export CONNECT_ID=$CONNECT ; export SR_ID=$SR ; export KSQL_ID=$KSQL"  >> ./setup.txt
+echo "To set service IDs as environment variables paste/run this in your shell:"  >> /home/ec2-user/rbac.log
+echo "    export KAFKA_ID=$KAFKA_CLUSTER_ID ; export CONNECT_ID=$CONNECT ; export SR_ID=$SR ; export KSQL_ID=$KSQLSERVICEID"  >> /home/ec2-user/rbac.log

@@ -9,7 +9,7 @@ retry() {
     do
         if (( attempt_num == max_attempts ))
         then
-            echo "Failed after $attempt_num attempts"
+            echo "functions: Failed after $attempt_num attempts" >> /home/ec2-user/rbac.log
             return 1
         else
             printf "."
