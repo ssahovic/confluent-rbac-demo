@@ -166,18 +166,18 @@ confluent iam rolebinding create \
 
 ######################### print cluster ids and users again to make it easier to copypaste ###########
 
-echo "Finished setting up role bindings"
-echo "    kafka cluster id: $KAFKA_CLUSTER_ID"
-echo "    connect cluster id: $CONNECT"
-echo "    schema registry cluster id: $SR"
-echo "    ksql cluster id: $KSQL"
+echo "Finished setting up role bindings"  > ./setup.txt
+echo "    kafka cluster id: $KAFKA_CLUSTER_ID"  >> ./setup.txt
+echo "    connect cluster id: $CONNECT"  >> ./setup.txt
+echo "    schema registry cluster id: $SR"  >> ./setup.txt
+echo "    ksql cluster id: $KSQL"  >> ./setup.txt
 echo
-echo "    super user account: $SUPER_USER_PRINCIPAL"
-echo "    connect service account: $CONNECT_PRINCIPAL"
-echo "    schema registry service account: $SR_PRINCIPAL"
-echo "    KSQL service account: $KSQL_PRINCIPAL"
-echo "    C3 service account: $C3_PRINCIPAL"
+echo "    super user account: $SUPER_USER_PRINCIPAL"  >> ./setup.txt
+echo "    connect service account: $CONNECT_PRINCIPAL"  >> ./setup.txt
+echo "    schema registry service account: $SR_PRINCIPAL"  >> ./setup.txt
+echo "    KSQL service account: $KSQL_PRINCIPAL"  >> ./setup.txt
+echo "    C3 service account: $C3_PRINCIPAL"  >> ./setup.txt
 
 echo
-echo "To set service IDs as environment variables paste/run this in your shell:"
-echo "    export KAFKA_ID=$KAFKA_CLUSTER_ID ; export CONNECT_ID=$CONNECT ; export SR_ID=$SR ; export KSQL_ID=$KSQL"
+echo "To set service IDs as environment variables paste/run this in your shell:"  >> ./setup.txt
+echo "    export KAFKA_ID=$KAFKA_CLUSTER_ID ; export CONNECT_ID=$CONNECT ; export SR_ID=$SR ; export KSQL_ID=$KSQL"  >> ./setup.txt
