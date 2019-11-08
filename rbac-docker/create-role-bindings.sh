@@ -183,7 +183,7 @@ echo "    super user account: $SUPER_USER_PRINCIPAL" >> /home/ec2-user/rbac.log
 echo "    connect service account: $CONNECT_PRINCIPAL" >> /home/ec2-user/rbac.log
 echo "    schema registry service account: $SR_PRINCIPAL" >> /home/ec2-user/rbac.log
 echo "    KSQL service account: $KSQL_PRINCIPAL"  >> /home/ec2-user/rbac.log
-echo "    C3 service account: $C3_PRINCIPAL"  >> ./home/ec2-user/rbac.log
+echo "    C3 service account: $C3_PRINCIPAL"  >> /home/ec2-user/rbac.log
 
 echo
 echo "To set service IDs as environment variables paste/run this in your shell:"  >> /home/ec2-user/rbac.log
