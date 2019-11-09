@@ -193,3 +193,14 @@ echo "    C3 service account: $C3_PRINCIPAL"  >> /home/ec2-user/rbac.log
 echo
 echo "To set service IDs as environment variables paste/run this in your shell:"  >> /home/ec2-user/rbac.log
 echo "    export KAFKA_ID=$KAFKA_CLUSTER_ID ; export CONNECT_ID=$CONNECT ; export SR_ID=$SR ; export KSQL_ID=$KSQLSERVICEID"  >> /home/ec2-user/rbac.log
+
+# config bash_profile for ec2-user
+echo "export KAFKA_ID=$KAFKA_CLUSTER_ID
+export CONNECT_ID=$CONNECT
+export SR_ID=$SR
+export KSQL_ID=$KSQLSERVICEID" >> /home/ec2-user/.bash_profile
+chown ec2-user:ec2-user /home/ec2-user/.bash_profile
+echo "export KAFKA_ID=$KAFKA_CLUSTER_ID
+export CONNECT_ID=$CONNECT
+export SR_ID=$SR
+export KSQL_ID=$KSQLSERVICEID" >> /root/.bashrc
