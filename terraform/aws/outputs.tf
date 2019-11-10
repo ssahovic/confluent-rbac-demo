@@ -32,3 +32,13 @@ output "REST" {
 output "LDAP" {
   value = tonumber(var.instance_count) >= 1 ? " ldapsearch -D \"cn=Hubert J. Farnsworth,ou=people,dc=planetexpress,dc=com\" -w professor -p 389 -h ${join(",",formatlist("%s", aws_instance.rbac-demo.*.public_ip),)} -b \"dc=planetexpress,dc=com\" -s sub \"(objectclass=*)\"" : "Confluent Cloud Platform on AWS is disabled"
 }  
+
+output "User-Property" {
+  value = tonumber(var.instance_count) >= 1 ? " echo \"sasl.mechanism=OAUTHBEARER
+security.protocol=SASL_PLAINTEXT
+sasl.login.callback.handler.class=io.confluent.kafka.clients.plugins.auth.token.TokenUserLoginCallbackHandler
+sasl.jaas.config=org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required \
+username=\"bender\" \
+password=\"bender\" \
+metadataServerUrls="http://${join(",",formatlist("%s", aws_instance.rbac-demo.*.public_ip),)} :8090\"\"" : "Confluent Cloud Platform on AWS is disabled"
+}  
