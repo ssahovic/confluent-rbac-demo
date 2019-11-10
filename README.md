@@ -12,6 +12,8 @@ This docker-compose based setup includes:
 - C3
 - install all utilities like jq, docker, expect, wget, unzip, java, ldap-tools
 
+![deployed RBAC Demo in AWS](images/RBAC-Demo-AWS.png)
+
 ## Prerequisites
 
 - create SSH key and deploy in AWS/Google, I use the key name `hackathon-temp-key`
