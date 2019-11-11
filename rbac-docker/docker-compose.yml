@@ -156,6 +156,9 @@ services:
       KAFKA_LDAP_USER_MEMBEROF_ATTRIBUTE: ou
       KAFKA_LDAP_GROUP_NAME_ATTRIBUTE: cn
       KAFKA_LDAP_GROUP_OBJECT_CLASS: group
+      KAFKA_LDAP_GROUP_MEMBER_ATTRIBUTE: member
+      # added for looking the groups
+      KAFKA_LDAP_GROUP_MEMBER_ATTRIBUTE_PATTERN: cn=(.*),ou=people,dc=planetexpress,dc=com
 
       # ======================= CONFIGURE METRICS REPORTER =========================
       KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
