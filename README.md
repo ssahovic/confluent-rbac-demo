@@ -79,8 +79,7 @@ or check logs:
 docker-compose -p rbac logs ksql-server
 docker-compose -p rbac logs control-center
 ```
-
-Kafka broker is available at `localhost:9094` (note, not 9092). All other services are at localhost with standard ports (e.g. C3 is 9021 etc).
+If you work on the local aws compute instance via ssh then Kafka broker is available at `localhost:9094` (note, not 9092). All other services are at localhost with standard ports (e.g. C3 is 9021 etc).
 In the AWS compute you can work with localhost, if you work from your local machine then please use the Public IP generated as output from terraform deployment
 
 | Service         | Host:Port        |
@@ -93,6 +92,8 @@ In the AWS compute you can work with localhost, if you work from your local mach
 | OpenLDAP        | `localhost:389`  |
 | Schema Registry | `localhost:8081` |
 
+If you are working remote from your machine, where you deployed the aws compute then use the Public IP instead of localhost.
+
 ### Granting Rolebindings
 Check LDAP Users in openLDAP:
 ```
@@ -103,54 +104,83 @@ Or open ApacheDirectory Studio and login as cn=admin,dc=planetexpress,dc=com wit
 After Deployment the following setup is configured
 ![deployed RBAC configuration](images/LDAP-ACCESS2Kafka.png)
 
+We use the docker container for openLDAP. Please describtion [here](https://github.com/rroemhild/docker-test-openldap)
+
 # Short Demo
 Now check what is this deployment about:
 Login into aws compute
 ```
 ssh -i ~/keys/hackathon-temp-key.pem ec2-user@publicip
 ```
-Create topic as user bender:
+Start to list all role bindings. Login as SuperUser to MDS Service: 
 ```
-cd /home/ec2-user/software/confluent-rbac-demo-master/rbac-docker/client-configs/
-# As bender should fail
-kafka-topics --bootstrap-server localhost:9094 --create --topic cmtest --partitions 1 --replication-factor 1 --command-config bender.properties
-```
-Try now as professor, he is the SuperUser
-```
-cp bender.properties professor.properties
-vi professor.properties
-  ==> change to professor / professor
-kafka-topics --bootstrap-server localhost:9094 --create --topic cmtest --partitions 1 --replication-factor 1 --command-config professor.properties
-kafka-topics --bootstrap-server localhost:9094 --list --command-config professor.properties
-```
-Try all the URLs as short demo :
-  * go to control center as professor http://publicip:9021
-  * logout try as Hermes, he is also SystemAdmin http://publicip :9021
-  * He did not see CONNECT, KSQL
-
-Try Schema Registry
-```
-# not authorized
-curl localhost:8081/subjects
-# Authroized User
-curl -u professor:professor localhost:8081/subjects
-# Showed empty Schema
-```
-List role bindings
-```
-# login as professor
+# login as professor with password professor
 confluent login --url http://localhost:8090
+```
+now list all rolebindings step by step
+```
 confluent iam rolebinding list --principal User:professor --kafka-cluster-id $KAFKA_ID 
 confluent iam rolebinding list --principal User:professor --kafka-cluster-id $KAFKA_ID --ksql-cluster-id $KSQL_ID
 confluent iam rolebinding list --principal User:hermes --kafka-cluster-id $KAFKA_ID
 confluent iam rolebinding list --principal User:leela --kafka-cluster-id $KAFKA_ID --schema-registry-cluster-id $SR_ID
 confluent iam rolebinding list --principal User:frey --kafka-cluster-id $KAFKA_ID --connect-cluster-id $CONNECT_ID
 ```
+or use one command to list all (env variable $KAFKA_ID is already set in aws compute) rolebindings:
+```
+# check if env is set
+echo $KAFKA_ID
+for i in "professor" "hermes" "leela" "fry" "amy" "bender" "carsten"; do echo "confluent iam rolebinding list --principal User:${i} --kafka-cluster-id ${KAFKA_ID}"; confluent iam rolebinding list --principal User:${i} --kafka-cluster-id ${KAFKA_ID}; done
+```
+Create topic as user bender, first show configs property files:
+```
+cd /home/ec2-user/software/confluent-rbac-demo-master/rbac-docker/client-configs/
+Show client configs, which are prepared in aws compute:
+```
+ls
+cat professor.properties
+cat bender.properties
+```
+Now, try to create a topic as user bender (should fail):
+```
+kafka-topics --bootstrap-server localhost:9094 --create --topic cmtest --partitions 1 --replication-factor 1 --command-config bender.properties
+```
+see error statement `[Authorization failed.]`
+Try now as professor, he is the SuperUser:
+```
+kafka-topics --bootstrap-server localhost:9094 --create --topic cmtest --partitions 1 --replication-factor 1 --command-config professor.properties
+kafka-topics --bootstrap-server localhost:9094 --list --command-config professor.properties
+```
+Try all the URLs as short demo :
+  * go to control center as professor http://publicip:9021
+  * logout try as Hermes, he is also SystemAdmin http://publicip :9021
+  * He did not see CONNECT, KSQL and has no access to Schema Registry (Topic View)
+
+Try Schema Registry
+* as unauthoried user:
+```
+curl localhost:8081/subjects
+```
+As Authroized User:
+```
+curl -u professor:professor localhost:8081/subjects
+# Showed empty Schema
+```
+try as anonymous user (is not configured):
+```
+curl -u ANONYMOUS localhost:8081/subjects
+```
+And finally try as user frey
+```
+curl -u fry:fry localhost:8081/subjects
+# Will show empty Schema
+```
+This was a short overview of configured RBAC environment.
+
 
 # HANDS-ON
 First login into Compute instance on AWS
 ```
-ssh -i ~/keys/hackathon-temp-key.pem ec2-user@publicip
+ssh -i ~/keys/hackathon-temp-key.pem ec2-user@pubip
 cd software/confluent-rbac-demo-master/rbac-docker/client-configs/
 ```
 
@@ -164,7 +194,7 @@ Get Schema from Schema Registry;
 curl -u professor:professor localhost:8081/subjects
 ```
 
-Check Schema also in C3 http://publicip:9021 under topic cmtest and then Schema.
+Check Schema also in C3 http://publicip:9021 as user professor. Go to topic cmtest and then Schema.
 Load data into cmtest2 topic and create it first
 ```
 kafka-topics --bootstrap-server localhost:9094 --create --topic cmtest2 --partitions 1 --replication-factor 1 --command-config professor.properties
@@ -185,18 +215,30 @@ CTRL+c
 Create SCHEMA for CMTEST2
 ```
 curl -u professor:professor -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '{"schema": "{\"type\":\"record\",\"name\":\"myrecord\",\"namespace\":\"io.confluent.examples.clients.basicavro\",\"fields\":[{\"name\":\"f1\",\"type\":\"string\"}]}"}' http://localhost:8081/subjects/cmtest2-value/versions
-# get all Schemas
+```
+Get all Schemas
+```
 curl -u professor:professor localhost:8081/subjects
-# get data from Schemafor cmtest2
+```
+Get data of Schema for cmtest2
+```
 curl -u professor:professor localhost:8081/subjects/cmtest2-value/versions/latest
 ```
 You may also check in C3 if you want
 
-Consume Data from CMTEST2 
-```kafka-console-consumer --bootstrap-server localhost:9094 \
+Consume Data from CMTEST2 as professor
+```
+kafka-console-consumer --bootstrap-server localhost:9094 \
 --consumer.config professor.properties --topic cmtest2 --from-beginning
 ```
-Use KSQL cli and play aroud, Login as professor (Superuser)
+Use KSQL cli and play aroud, first with fry (not allowed):
+```
+ksql -u fry -p fry http://localhost:8088
+ksql> show topics;
+ksql> print 'cmtest2' from beginning;
+ksql> exit
+```
+Now, login as professor (Superuser)
 ```
 ksql -u professor -p professor http://localhost:8088
 ksql> show topics;
@@ -206,7 +248,6 @@ ksql> describe extended JIMNEWTOPIC;
 ksql> SET 'auto.offset.reset'='earliest';
 ksql> select * from JIMNEWTOPIC;
 ```
-
 open a second Terminal and produce data into topic JIMNEWTOPIC
 ```
 kafka-console-producer --broker-list localhost:9094 --producer.config professor.properties --topic JIM-NEW-TOPIC
@@ -219,37 +260,31 @@ so?
 ```
 The producer data should be visible in Terminal 1 (KSQL cli open select).
 
-
-Now, enable user Bender for some specific work:
-Bender becomes ResourceOwner of a Topic and would be enabled to consume.
+Now, enable user Bender for some specific work.
+First Grant User:bender ResourceOwner to prefix Topic:foo on Kafka cluster KAFKA_ID:
 ```
 confluent login --url http://localhost:8090 # as professor
 confluent iam rolebinding create --principal User:bender --kafka-cluster-id $KAFKA_ID --role ResourceOwner --resource Topic:foo --prefix
 ```
-
-List Role Bindings for bender:
+List created rolebinding:
 ```
 confluent iam rolebinding list --principal User:bender --kafka-cluster-id $KAFKA_ID
 ```
-
-bender now create a topic and produce data
+Create topic and produce data as bender:
 ```
-# Create topic and producer
 kafka-topics --bootstrap-server localhost:9094 --create --topic foo.topic1 --partitions 1 --replication-factor 1 --command-config bender.properties
 # should only list foo.topic1
 kafka-topics --bootstrap-server localhost:9094 --list  --command-config bender.properties
 # produce into topic
 seq 1000 | kafka-console-producer --broker-list localhost:9094 --producer.config bender.properties --topic foo.topic1
 ```
-Unfortunately consuming data is not working for bender:
+Try to consume of topic as bender (shoudl fail):
 ```
-# Consume is not working
 kafka-console-consumer --bootstrap-server localhost:9094 \
 --consumer.config bender.properties --topic foo.topic1 --from-beginning
 ```
-Bender do need some more roles assignments:
+There are some missing roles for bender, add them:
 ```
-# add missing roles
 # READ Role
 confluent iam rolebinding create \
 --principal User:bender \
@@ -257,7 +292,14 @@ confluent iam rolebinding create \
 --resource Topic:foo.topic1 \
 --prefix \
 --kafka-cluster-id $KAFKA_ID
-# access to consumer group
+```
+Try again to consume
+```
+kafka-console-consumer --bootstrap-server localhost:9094 \
+--consumer.config bender.properties --topic foo.topic1 --from-beginning
+```
+Still one role missing to access to consumer group, add: 
+```
 confluent iam rolebinding create \
 --principal User:bender \
 --role DeveloperRead \
@@ -265,34 +307,29 @@ confluent iam rolebinding create \
 --prefix \
 --kafka-cluster-id $KAFKA_ID
 ```
-
-Consume again, now should work and bender should be able to read from topic:
+Consume again, now should work
 ```
 kafka-console-consumer --bootstrap-server localhost:9094 \
 --consumer.config bender.properties --topic foo.topic1 --from-beginning
-# List roles for bender
-confluent iam rolebinding list --principal Group:ReadUsers --kafka-cluster-id $KAFKA_ID
 ```
-
-Amy is also in the openLDAP, we can give her seom access, before doing that change her password:
+List roles for bender
 ```
-# give Amy read access
-cp bender.properties amy.properties
-vi amy.properties
-  ==> change username and pw
-# Go info Apache Directory and set password to amy / amy
-go to Apache Directory Studio
+confluent iam rolebinding list --principal User:bender --kafka-cluster-id $KAFKA_ID
 ```
-
-Try to consume with Amy (should not work):
+Give Amy read access, but first go into Apache Directory and set password to amy,
+or via ldap tools but is not working
+```
+ldappasswd -H ldap://localhost:389 -x -D "cn=admin,dc=planetexpress,dc=com" -W -S "uid=amy,ou=people,dc=planetexpress,dc=com"
+# first amy, and amy
+# then admin password is GoodNewsEveryone
+```
+Consume is not working:
 ```
 kafka-console-consumer --bootstrap-server localhost:9094 \
 --consumer.config amy.properties --topic foo.topic1 --from-beginning
 ```
-
-To enable read for Amy we should assign some roles to her:
+add missing roles to amy
 ```
-# add missing roles
 # READ Role
 confluent iam rolebinding create \
 --principal User:amy \
@@ -308,23 +345,29 @@ confluent iam rolebinding create \
 --prefix \
 --kafka-cluster-id $KAFKA_ID
 ```
-
-Now, Amy should see the topic and be able to consume:
+List topics, if Amy is able to see something:
 ```
-# List topics
 kafka-topics --bootstrap-server localhost:9094 --list  --command-config amy.properties
-# Consume again, now should work
+```
+And now consume, should work
+```
 kafka-console-consumer --bootstrap-server localhost:9094 \
 --consumer.config amy.properties --topic foo.topic1 --from-beginning
 ```
-
-Check all roles for Bender:
+List roles of amy
 ```
-# List roles for bender
 confluent iam rolebinding list --principal User:amy --kafka-cluster-id $KAFKA_ID
 ```
+Try ksql cli as bender:
+```
+ksql -u bender -p bender http://localhost:8088
+ksql> show topics;
+ksql> show streams;
+ksql> exit
+```
+Start control center as Amy and check topics, ksql etc. http://pubip:9021
 
-Delete Amy Access ON TOPIC
+Delete AMy Access ON TOPIC
 ```
 confluent iam rolebinding delete \
 --principal User:amy \
@@ -340,30 +383,18 @@ confluent iam rolebinding delete \
 --prefix \
 --kafka-cluster-id $KAFKA_ID
 ```
-
-list roles of Amy:
+List roles of Amy
 ```
 confluent iam rolebinding list --principal User:amy --kafka-cluster-id $KAFKA_ID
 ```
-
-We did assign roles directly to user. Now, we would try to do it on groups:
-  * Create new Group in LDAP
-  * login in Apache Dorectory Studio as admin
-  * create new user, , click on a existing user add new entry change cn carsten, change everything to doerte
-  * create new group, click on a existing group add new entry change cn to ReadUsers member : uid=carsten
-
-Create a user:
-![New group in LDAP](images/ldap_user_carsten.png)
-
-Create a group and assign new user as member:
-![New group in LDAP](images/ldap_group_ReadUsers.png)
-
-Ok, create access for all users in LDAP grouop ReadUsers;
-login as professor:
+We have seen only user role assignments, now we would like to use groups, to make the live of an Admin easier:
+1. Create new Group in LDAP, login in Apache Dorectory Studio as admin
+    * create new user, , click on a existing user add new entry change cn carsten, change everything to doerte
+    * create new group, click on a existing group add new entry change cn to ReadUsers member : uid=carsten
+Now, assign roles and login as professor
 ```
 confluent login --url http://localhost:8090
 ```
-
 Assign read access to group ReadUsers
 ```
 # READ Role
@@ -373,7 +404,9 @@ confluent iam rolebinding create \
 --resource Topic:foo.topic1 \
 --prefix \
 --kafka-cluster-id $KAFKA_ID
-# access to consumer group
+```
+Assign role to consumer group
+```
 confluent iam rolebinding create \
 --principal Group:ReadUsers \
 --role DeveloperRead \
@@ -381,30 +414,30 @@ confluent iam rolebinding create \
 --prefix \
 --kafka-cluster-id $KAFKA_ID
 ```
-
-List roles for Group ReadUsers;
+List roles for Group ReadUsers
 ```
 confluent iam rolebinding list --principal Group:ReadUsers --kafka-cluster-id $KAFKA_ID
 ```
-
-Create property file for carsten who is member of ReadUsers:
-```
-cp bender.properties carsten.properties
-vi carsten.properties # change username /password to carsten
-```
-
 Check if now carsten can read via group role assigment
 ```
 kafka-topics --bootstrap-server localhost:9094 --list  --command-config carsten.properties
-#consume
+```
+And try to consume as carsten
+```
 kafka-console-consumer --bootstrap-server localhost:9094 \
 --consumer.config carsten.properties --topic foo.topic1 --from-beginning
 ```
-
-ENDE HANDS-ON
+List roles of Carsten (list over role, will be derived)
+```
+confluent iam rolebinding list --principal User:carsten --kafka-cluster-id $KAFKA_ID
+```
+you should see
+`     Principal    |     Role      | ResourceType |       Name        | PatternType  
++-----------------+---------------+--------------+-------------------+-------------+
+  Group:ReadUsers | DeveloperRead | Group        | console-consumer- | PREFIXED     
+  Group:ReadUsers | DeveloperRead | Topic        | foo.topic1        | PREFIXED     '
 
 # Stop
-
 Outside of aws compute, please use terraform, to really destroy the environment out of aws:
 ```
 terraform destroy
@@ -422,7 +455,7 @@ A restart inside the compute:
 ```
 
 ---
-
+# Additional Information
 Login to CLI as `professor:professor` as a super user to grant initial role bindings
 
 ```
@@ -430,13 +463,12 @@ Login to CLI as `professor:professor` as a super user to grant initial role bind
 confluent login --url http://localhost:8090
 # for running on your local machine again cloud
 confluent login --url http://pubip:8090
-
 ```
 
-Set `KAFKA_CLUSTER_ID`
+Set `KAFKA_CLUSTER_ID` in aws it is already prepared for you.
 
 ```
-ZK_HOST=localhost:2181
+ZK_HOST=publicip:2181
 KAFKA_CLUSTER_ID=$(zookeeper-shell $ZK_HOST get /cluster/id 2> /dev/null | grep version | jq -r .id)
 ```
 
@@ -463,7 +495,7 @@ confluent iam rolebinding create --role [role name] --principal User:[username] 
 available role types and permissions can be found [Here](https://docs.confluent.io/current/security/rbac/rbac-predefined-roles.html)
 
 resource types include: Cluster, Group, Subject, Connector, TransactionalId, Topic
-### Users
+## Users and setup
 
 ---
 
@@ -472,7 +504,7 @@ resource types include: Cluster, Group, Subject, Connector, TransactionalId, Top
 | Super User      | User:professor | SystemAdmin |
 | Connect         | User:fry       | SystemAdmin |
 | Schema Registry | User:leela     | SystemAdmin |
-| KSQL            | User:zoidberg  | SystemAdmin |
+| KSQL            | User:professor | SystemAdmin |
 | C3              | User:hermes    | SystemAdmin |
 | Test User       | User:bender    | \<none>     |
 
