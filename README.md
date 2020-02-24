@@ -18,7 +18,7 @@ This docker-compose based setup includes:
 
 - create SSH key and deploy in AWS/Google, I use the key name `hackathon-temp-key`
 ---
-The AWS Compute instance will everything prepare to run this demo, including
+The AWS compute instance will everything prepare to run this demo, including
 - docker
 - Confluent Platform with all utilities installed
 - `zookeeper-shell` must be on your `PATH`
@@ -31,14 +31,14 @@ Apache Directory Studio is important if you want to add user/group in openLDAP o
 
 ## Image Versions
 
-We will use `PREFIX=confluentinc` and `TAG=5.3.1` for all images running via docker-compose. If you want to run newr docker images from Confluent, please change the `docker-compose.yml` file.
+We will use `PREFIX=confluentinc` and `TAG=5.4.0` for all images running via docker-compose. If you want to run newer docker images from Confluent, please change the `docker-compose.yml` file.
 
 
 ## Getting Started
 
 ---
 
-To start confluent platform 5.3.1 including setup for RBC demo in AWS run
+To start confluent platform 5.4.0 including setup for RBC demo in AWS run
 
 ```
 wget https://github.com/ora0600/confluent-rbac-demo/archive/master.zip
@@ -402,7 +402,7 @@ ksql> exit
 
 Start control center as Amy and check topics, ksql etc. http://pubip:9021
 
-Delete AMy Access ON TOPIC
+Delete Amy Access ON TOPIC
 ```
 confluent iam rolebinding delete \
 --principal User:amy \
