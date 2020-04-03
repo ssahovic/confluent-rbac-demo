@@ -78,5 +78,8 @@ or use one command to list all (env variable $KAFKA_ID is already set in aws com
 # check if env is set
 echo $KAFKA_ID
 for i in "professor" "hermes" "leela" "fry" "amy" "bender" "carsten"; do echo "confluent iam rolebinding list --principal User:${i} --kafka-cluster-id ${KAFKA_ID}"; confluent iam rolebinding list --principal User:${i} --kafka-cluster-id ${KAFKA_ID}; done
+```
+you can also check the security with Confluent Control Center. Use [http://pubip:9021](http://pubip:9021)
+![Control Center](images/c3_rbac_setup.png)
 
 go back to [to Lab Overview](../Readme.md)
