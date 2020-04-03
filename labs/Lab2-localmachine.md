@@ -32,4 +32,4 @@ Try to login with different user in control center and check what these user can
 * User: leela is Security Admin for Schema Registy
 * User: bender? 
 
-go back to [to Lab Overview](https://github.com/ora0600/confluent-rbac-hands-on)
+go back to [to Lab Overview](https://github.com/ora0600/confluent-rbac-hands-on#hands-on-agenda-and-labs)

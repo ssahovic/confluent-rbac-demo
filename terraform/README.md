@@ -45,7 +45,7 @@ ssh -i ~/keys/hackathon-temp-key.pem ec2-user@pubip
 cd /home/ec2-user/software/confluent-rbac-hands-on-master/rbac-docker
 ./confluent-start.sh
 ```
-Doing hands-on see [Start-Page](https://github.com/ora0600/confluent-rbac-hands-on)
+Doing hands-on see [Start-Page](https://github.com/ora0600/confluent-rbac-hands-on#hands-on-agenda-and-labs)
 
 To stop docker-compose setup:
 ```bash

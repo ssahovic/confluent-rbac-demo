@@ -77,19 +77,19 @@ Get all Schemas
 curl -u professor:professor localhost:8081/subjects
 ```
 Get data of Schema for test2
-```
+```bash
 curl -u professor:professor localhost:8081/subjects/test2-value/versions/latest
 ```
 You may also check in C3 if you want.
 
 Consume Data from TEST2 as professor
-```
+```bash
 kafka-console-consumer --bootstrap-server localhost:9094 \
 --consumer.config professor.properties --topic test2 --from-beginning
 ```
 
 Use KSQL cli and play aroud, first with fry (not allowed):
-```
+```bash
 ksql -u fry -p fry http://localhost:8088
 ksql> show topics;
 ksql> print 'test2' from beginning;
@@ -97,7 +97,7 @@ ksql> exit
 ```
 
 Now, login as professor (Superuser)
-```
+```bash
 ksql -u professor -p professor http://localhost:8088
 ksql> show topics;
 ksql> show streams;
@@ -108,7 +108,7 @@ ksql> select * from TEST2STREAM emit changes;
 ```
 
 Open a second Terminal and produce data into topic JIMNEWTOPIC
-```
+```bash
 kafka-console-producer --broker-list localhost:9094 --producer.config professor.properties --topic test2
 Hallo
 Warum
@@ -121,7 +121,7 @@ The producer data should be visible in Terminal 1 (KSQL cli open select).
 
 Now, enable user Bender for some specific work.
 First Grant User:bender ResourceOwner to prefix Topic:foo on Kafka cluster KAFKA_ID:
-```
+```bash
 confluent login --url http://localhost:8090 # as professor
 confluent cluster describe --url http://localhost:8090
 export KAFKA_ID=4QSNFjpeSoyLMCsNOTJo7Q
@@ -131,12 +131,12 @@ You can do this also with Control Center;
 ![set Security for Bender](images/set_bender_sec.png)
 
 List created rolebinding:
-```
+```bash
 confluent iam rolebinding list --principal User:bender --kafka-cluster-id $KAFKA_ID
 ```
 
 Create topic and produce data as bender:
-```
+```bash
 kafka-topics --bootstrap-server localhost:9094 --create --topic foo.topic1 --partitions 1 --replication-factor 1 --command-config bender.properties
 # List topic, should only list foo.topic1
 kafka-topics --bootstrap-server localhost:9094 --list  --command-config bender.properties
@@ -145,13 +145,13 @@ seq 1000 | kafka-console-producer --broker-list localhost:9094 --producer.config
 ```
 
 Try to consume of topic as bender (should fail):
-```
+```bash
 kafka-console-consumer --bootstrap-server localhost:9094 \
 --consumer.config bender.properties --topic foo.topic1 --from-beginning
 ```
 
 There are some missing roles for bender, add them:
-```
+```bash
 # READ Role
 confluent iam rolebinding create \
 --principal User:bender \
@@ -160,7 +160,6 @@ confluent iam rolebinding create \
 --prefix \
 --kafka-cluster-id $KAFKA_ID
 # Still one role missing to access to consumer group, add: 
-```
 confluent iam rolebinding create \
 --principal User:bender \
 --role DeveloperRead \
@@ -170,16 +169,16 @@ confluent iam rolebinding create \
 ```
 
 Consume again, now should work
-```
+```bash
 kafka-console-consumer --bootstrap-server localhost:9094 \
 --consumer.config bender.properties --topic foo.topic1 --from-beginning
 ```
 
 List roles for bender
-```
+```bash
 confluent iam rolebinding list --principal User:bender --kafka-cluster-id $KAFKA_ID
 ```
 
 This was a short overview of configured RBAC environment.
 
-go back to [to Lab Overview](https://github.com/ora0600/confluent-rbac-hands-on)
+go back to [to Lab Overview](https://github.com/ora0600/confluent-rbac-hands-on#hands-on-agenda-and-labs)

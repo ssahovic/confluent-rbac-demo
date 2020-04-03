@@ -22,7 +22,7 @@ Start the demo environment on your local machine
 git clone https://github.com/ora0600/confluent-rbac-hands-on.git
 ./confluent-start.sh
 ```
-Doing hands-on see [Start-Page](https://github.com/ora0600/confluent-rbac-hands-on)
+Doing hands-on see [Start-Page](https://github.com/ora0600/confluent-rbac-hands-on#hands-on-agenda-and-labs)
 
 To stop docker-compose setup:
 ```

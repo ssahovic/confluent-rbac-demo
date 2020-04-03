@@ -1,4 +1,4 @@
-# Lab 1: Check the RBAC environment in Cloud
+# Lab 1: Check the RBAC environment on local machine
 If the environment is not started yet, please do so in cloud compute instance:
 The docker-compose project is `rbac`. 
 ```bash
@@ -53,4 +53,4 @@ We use the docker container for openLDAP. Please see the description [here](http
 After Deployment the following setup is configured
 ![deployed RBAC configuration](images/LDAP-ACCESS2Kafka.png)
 
-go back to [to Lab Overview](https://github.com/ora0600/confluent-rbac-hands-on)
+go back to [to Lab Overview](https://github.com/ora0600/confluent-rbac-hands-on#hands-on-agenda-and-labs)

@@ -40,7 +40,7 @@ SSH =  SSH  Access: ssh -i ~/keys/hackathon-temp-key.pem ec2-user@pubip
 ZOOKEEPER =  --zookeeper pubip:2181
 ```
 
-Doing hands-on see [Start-Page](https://github.com/ora0600/confluent-rbac-hands-on)
+Doing hands-on see [Start-Page](https://github.com/ora0600/confluent-rbac-hands-on#hands-on-agenda-and-labs)
 
 To stop docker-compose setup:
 ```

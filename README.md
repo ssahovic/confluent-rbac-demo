@@ -64,13 +64,13 @@ Three days before the workshop we will send out to all attendees an email:
      * Lab 2: Get started with the environment
        - on your local machine, [goto Lab2-localmachine](labs/Lab2-localmachine.md)
        - in cloud , [goto to Lab2-cloud](labs/Lab2-cloud.md)
-LUNCH Break                                         -     60 Minutes
-3. Lab 3-4: RBAC real use case setuo                -    110 Minutes         
+3. LUNCH Break                                         -     60 Minutes
+4. Lab 3-4: RBAC real use case setuo                -    110 Minutes         
    * Short Introduction and demo by presenter (20 Min)
    * Attendess doing their labs (90 Min)
    * Lab 3. First Authorization check: Execute check authorization lab: [Lab3](labs/Lab3.md)
    * Lab 4. Advanced RBAC Lab, setupo real use case: [Lab4](labs/Lab4.md)
-4. Wrap-up and Finish                               -     15 Minutes
+5. Wrap-up and Finish                               -     15 Minutes
 
 # Stop everything
 Outside of cloud compute, please use terraform, to really destroy the environment out of cloud:
