@@ -24,6 +24,8 @@ services:
     ports:
       - "389:389"
     privileged: true
+    volumes:
+        - ./add-user/:/etc/add-user/
 
   broker:
     image: confluentinc/cp-server:5.4.1

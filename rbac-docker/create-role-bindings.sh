@@ -192,5 +192,5 @@ echo "    C3 service account: $C3_PRINCIPAL"
 
 echo
 echo "To set service IDs as environment variables paste/run this in your shell:"  
-echo "    export KAFKA_ID=$KAFKA_CLUSTER_ID ; export CONNECT_ID=$CONNECT ; export SR_ID=$SR ; export KSQL_ID=$KSQLSERVICEID"  
+echo "    export KAFKA_ID=$KAFKA_CLUSTER_ID ; export CONNECT_ID=$CONNECT ; export SR_ID=$SR ; export KSQL_ID=$KSQLSERVICEID" > ./clusterids 
 

@@ -1,24 +1,3 @@
-
-# Add group to the organization
-DN: cn=coc_dlp_producer,ou=people,dc=planetexpress,dc=com
-changetype: add
-objectClass: Group
-objectClass: top
-cn: coc_dlp_producer
-groupType: 2147483650
-member: cn=coc_dlp_ext,ou=people,dc=planetexpress,dc=com
-member: cn=coc_dlp_aap,ou=people,dc=planetexpress,dc=com
-
-# Add group to the organization
-DN: cn=coc_dlp_consumer,ou=people,dc=planetexpress,dc=com
-changetype: add
-objectClass: Group
-objectClass: top
-cn: coc_dlp_consumer
-groupType: 2147483650
-member: cn=coc_dlp_aap,ou=people,dc=planetexpress,dc=com
-member: cn=coc_dlp_int,ou=people,dc=planetexpress,dc=com
-
 # Add peter to the organization
 dn: cn=peter,ou=people,dc=planetexpress,dc=com
 changetype: add
