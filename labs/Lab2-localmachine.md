@@ -32,4 +32,4 @@ Try to login with different user in control center and check what these user can
 * User: leela is Security Admin for Schema Registy
 * User: bender? 
 
-go back to [to Lab Overview](../Readme.md)
+go back to [to Lab Overview](../../Readme.md)
