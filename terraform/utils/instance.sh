@@ -34,25 +34,25 @@ cd /home/ec2-user/software
 
 # install Confluent Platform
 wget ${confluent_platform_location}
-tar -xvf confluent-5.3.1-2.12.tar.gz
-chown ec2-user:ec2-user -R confluent-5.3.1/*
-rm confluent-5.3.1-2.12.tar.gz
+tar -xvf confluent-5.4.1-2.12.tar.gz
+chown ec2-user:ec2-user -R confluent-5.4.1/*
+rm confluent-5.4.1-2.12.tar.gz
 
-export PATH=/bin:/usr/local/bin:/home/ec2-user/software/confluent-5.3.1/bin:\$PATH
-export CONFLUENT_HOME=/home/ec2-user/software/confluent-5.3.1
+export PATH=/bin:/usr/local/bin:/home/ec2-user/software/confluent-5.4.1/bin:\$PATH
+export CONFLUENT_HOME=/home/ec2-user/software/confluent-5.4.1
 
 # install RBAC Demo
 wget ${confluent_rbac_demo}
 unzip master.zip
-chown ec2-user:ec2-user -R /home/ec2-user/software/confluent-rbac-demo-master/
+chown ec2-user:ec2-user -R /home/ec2-user/software/confluent-rbac-hands-on-master/
 rm master.zip
-chown ec2-user:ec2-user -R confluent-rbac-demo-master/*
-cd /home/ec2-user/software/confluent-rbac-demo-master
+chown ec2-user:ec2-user -R confluent-rbac-hands-on-master/*
+cd /home/ec2-user/software/confluent-rbac-hands-on-master
 rm -r terraform/
 
 
 # set PUBLIC IP and change the Data in docker-compose.yaml
-cd /home/ec2-user/software/confluent-rbac-demo-master/rbac-docker
+cd /home/ec2-user/software/confluent-rbac-hands-on-master/rbac-docker
 PUBIP=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 SCRIPT1="sed -i 's/CONNECT_REST_ADVERTISED_HOST_NAME: connect/CONNECT_REST_ADVERTISED_HOST_NAME: $PUBIP/g' docker-compose.yml;"
 SCRIPT2="sed -i 's/CONTROL_CENTER_KSQL_KSQL1_ADVERTISED_URL: http:\/\/localhost:8088/CONTROL_CENTER_KSQL_KSQL1_ADVERTISED_URL: http:\/\/$PUBIP:8088/g' docker-compose.yml;"
@@ -65,12 +65,12 @@ bash -c "$SCRIPT3"
 bash -c "$SCRIPT4"
 
 # config bash_profile for ec2-user
-echo "export PATH=/usr/local/bin:/home/ec2-user/software/confluent-5.3.1/bin:\$PATH
-export CONFLUENT_HOME=/home/ec2-user/software/confluent-5.3.1" >> /home/ec2-user/.bash_profile
+echo "export PATH=/usr/local/bin:/home/ec2-user/software/confluent-5.4.1/bin:\$PATH
+export CONFLUENT_HOME=/home/ec2-user/software/confluent-5.4.1" >> /home/ec2-user/.bash_profile
 chown ec2-user:ec2-user /home/ec2-user/.bash_profile
-echo "export PATH=/bin:/usr/local/bin:/home/ec2-user/software/confluent-5.3.1/bin:\$PATH
-export CONFLUENT_HOME=/home/ec2-user/software/confluent-5.3.1" >> /root/.bashrc
+echo "export PATH=/bin:/usr/local/bin:/home/ec2-user/software/confluent-5.4.1/bin:\$PATH
+export CONFLUENT_HOME=/home/ec2-user/software/confluent-5.4.1" >> /root/.bashrc
 
 # Start environment
-/home/ec2-user/software/confluent-rbac-demo-master/rbac-docker/confluent-start.sh
+/home/ec2-user/software/confluent-rbac-hands-on-master/rbac-docker/confluent-start.sh
 chown ec2-user:ec2-user -R conf/
