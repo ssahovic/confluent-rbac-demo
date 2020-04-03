@@ -72,5 +72,5 @@ echo "export PATH=/bin:/usr/local/bin:/home/ec2-user/software/confluent-5.4.1/bi
 export CONFLUENT_HOME=/home/ec2-user/software/confluent-5.4.1" >> /root/.bashrc
 
 # Start environment
-/home/ec2-user/software/confluent-rbac-hands-on-master/rbac-docker/confluent-start.sh
-chown ec2-user:ec2-user -R conf/
+#/home/ec2-user/software/confluent-rbac-hands-on-master/rbac-docker/confluent-start.sh
+#chown ec2-user:ec2-user -R conf/

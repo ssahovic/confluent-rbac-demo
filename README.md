@@ -1,143 +1,53 @@
-# Running RBAC on docker-compose in AWS
+# Confluent Platform 5.4 Role-Based Access Control (RBAC) Hands-on Workshop
 
-This docker-compose based setup includes:
+Role based access control (RBAC) was introduced in Confluent Platform version 5.3 as a preview feature. With Confluent Platform 5.4 RBAC is now production ready.
 
-- Zookeeper
-- OpenLDAP
-- Kafka with MDS, connected to the OpenLDAP
-- Schema Registry
-- KSQL
-- Connect
-- Rest Proxy
-- C3
-- install all utilities like jq, docker, expect, wget, unzip, java, ldap-tools
+This github project describes a Hands-on Workshop around Confluent RBAC. The structure of the Hands-on is as followed
+* Explaining and Introduce Role based Access Control
+* Labs: Get to know the environment
+* Advanced explanation of Role based Access Control
+* RBAC Labs for try-out learnings
 
-![deployed RBAC Demo in AWS](images/RBAC-Demo-AWS.png)
+In general, the hands-on will take 4 hours.
 
-## Prerequisites
+# Environment for Hands-on Workshop Labs
 
+To execute the Labs  you will have two possibilities
+* run Docker-Compose on your own hardware/laptop [use docker-locally](rbac-docker/)
+* create the demo environment in Cloud Provider infrastructure, [deploy cloud environment](terraform/)
+
+## Prerequisites for running environment in Cloud
+For an environment in cloud you need to setup following
 - create SSH key and deploy in AWS/Google, I use the key name `hackathon-temp-key`
----
-The AWS Compute instance will everything prepare to run this demo, including
-- docker
-- Confluent Platform with all utilities installed
-- `zookeeper-shell` must be on your `PATH`
-- [Confluent CLI](https://docs.confluent.io/current/cli/index.html)
-- VPCs and Security Group setup
+- intall terraform
+- Having internet access
+The cloud environment will install automatically everything you need. 
+
+## Prerequisites for running environment on own hardware
+For an environment on your hardware, you need
+- Docker installed
+- Java8 installed
+- Confluent Platform 5.4 installed
 
 ### Optional
 Install on your desktop Apache Directory Studio to create and modify LDAP users in openLDAP. [Download Apache Directory Studio](https://directory.apache.org/studio/downloads.html)
 Apache Directory Studio is important if you want to add user/group in openLDAP or modify users or groups.
 
-## Image Versions
+# Hands-on Execution
+The structure of hands-on Workshop is as followed:
+## 1. Setup the Lab-Environment
+First of all you need to setup the Lab-Environment. Here you have two possibilities
+  * on your local machine, [goto docker-compose setup](rbac-docker/)
+  * in cloud environment, [goto to terraform setup](terraform/)
 
-We will use `PREFIX=confluentinc` and `TAG=5.3.1` for all images running via docker-compose. If you want to run newr docker images from Confluent, please change the `docker-compose.yml` file.
+If you run a Confluent leaded Hands-on Workshop, then Confluent can prepare a Lab-Environment in the cloud for you.
 
+## 2. Checking the Lab-Environment
+Checking your lab environment
+  * on your local machine, [goto Lab2-localmachine](labs/Lab2-localmachine.md)
+  * in cloud , [goto to Lab2-cloud](labs/Lab2-cloud.md)
 
-## Getting Started
-
----
-
-To start confluent platform 5.3.1 including setup for RBC demo in AWS run
-
-```
-wget https://github.com/ora0600/confluent-rbac-demo/archive/master.zip
-unzip master.zip
-rm master.zip
-cd confluent-rbac-demo-master/terraform/aws
-terraform init
-terraform plan
-terraform apply
-```
-Terraform will deploy the complete environment and start all service via docker-compose.
-The output of terraform will show you all the endpoints:
-```
-terraform output
-C3 =  Control Center: http://pubip:9021
-CONNECT =  Connect: curl http://pubip:8083
-KAFKA =  --bootstrap-Server pubip:9094
-KSQL =  ksql http://pubip:8088
-LDAP =  ldapsearch -D "cn=Hubert J. Farnsworth" -w professor -p 389 -h pubip -b "dc=planetexpress,dc=com" -s sub "(objectclass=*)"
-MDS =  confluent login --url  http://pubip:8090
-REST =  REST Proxy: curl  http://pubip:8082
-SR =  Schema Registry: curl  http://pubip:8081
-SSH =  SSH  Access: ssh -i ~/keys/hackathon-temp-key.pem ec2-user@pubip 
-ZOOKEEPER =  --zookeeper pubip:2181
-```
-It will take a while to configure and start every service in aws compute instance.
-
-## login into compute instance
-A AWS compute instance is created. You can login into AWS compute via
-```
-ssh -i hackathon-temp-key.epm ec2-user@PUBIP
-```
-The docker-compose project is `rbac`. docker-compose is after terraform deployment up and runnning.
-You can use standard docker-compose commands like this listing all containers:
-```
-docker-compose -p rbac ps
-```
-
-or check logs:
-
-```
-docker-compose -p rbac logs ksql-server
-docker-compose -p rbac logs control-center
-```
-If you work on the local aws compute instance via ssh then Kafka broker is available at `localhost:9094` (note, not 9092). All other services are at localhost with standard ports (e.g. C3 is 9021 etc).
-In the AWS compute you can work with localhost, if you work from your local machine then please use the Public IP generated as output from terraform deployment
-
-| Service         | Host:Port        |
-| --------------- | ---------------- |
-| Kafka           | `localhost:9094` |
-| MDS             | `localhost:8090` |
-| C3              | `localhost:9021` |
-| Connect         | `localhost:8083` |
-| KSQL            | `localhost:8088` |
-| OpenLDAP        | `localhost:389`  |
-| Schema Registry | `localhost:8081` |
-
-If you are working remote from your machine, from where you deployed the aws compute then use the Public IP instead of localhost.
-
-### Granted Rolebindings
-Check LDAP Users in openLDAP:
-```
-ldapsearch -D "cn=Hubert J. Farnsworth,ou=people,dc=planetexpress,dc=com" -w professor -p 389 -h localhost -b "dc=planetexpress,dc=com" -s sub "(objectclass=*)"
-```
-Or open ApacheDirectory Studio and login as cn=admin,dc=planetexpress,dc=com with password GoodNewsEveryone
-
-After Deployment the following setup is configured
-![deployed RBAC configuration](images/LDAP-ACCESS2Kafka.png)
-
-We use the docker container for openLDAP. Please see the description [here](https://github.com/rroemhild/docker-test-openldap)
-
-# Short Demo
-Now check what is this deployment about:
-Login into aws compute
-```
-ssh -i hackathon-temp-key.pem ec2-user@publicip
-```
-
-Start to list all role bindings. Login as SuperUser to MDS Service: 
-```
-# login as professor with password professor
-confluent login --url http://localhost:8090
-```
-
-now list all rolebindings step by step
-```
-confluent iam rolebinding list --principal User:professor --kafka-cluster-id $KAFKA_ID 
-confluent iam rolebinding list --principal User:professor --kafka-cluster-id $KAFKA_ID --ksql-cluster-id $KSQL_ID
-confluent iam rolebinding list --principal User:hermes --kafka-cluster-id $KAFKA_ID
-confluent iam rolebinding list --principal User:leela --kafka-cluster-id $KAFKA_ID --schema-registry-cluster-id $SR_ID
-confluent iam rolebinding list --principal User:frey --kafka-cluster-id $KAFKA_ID --connect-cluster-id $CONNECT_ID
-```
-
-or use one command to list all (env variable $KAFKA_ID is already set in aws compute) rolebindings:
-```
-# check if env is set
-echo $KAFKA_ID
-for i in "professor" "hermes" "leela" "fry" "amy" "bender" "carsten"; do echo "confluent iam rolebinding list --principal User:${i} --kafka-cluster-id ${KAFKA_ID}"; confluent iam rolebinding list --principal User:${i} --kafka-cluster-id ${KAFKA_ID}; done
-```
+## 3. Checking the Lab-Environment
 
 Create topic as user bender, first show configs property files:
 Show client configs, which are prepared in aws compute:
