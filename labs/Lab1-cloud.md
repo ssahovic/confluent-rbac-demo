@@ -54,4 +54,4 @@ We use the docker container for openLDAP. Please see the description [here](http
 After Deployment the following setup is configured
 ![deployed RBAC configuration](images/LDAP-ACCESS2Kafka.png)
 
-go back to [to Lab Overview](../../Readme.md)
+go back to [to Lab Overview](https://github.com/ora0600/confluent-rbac-hands-on)

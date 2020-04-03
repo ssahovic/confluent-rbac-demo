@@ -11,7 +11,7 @@ This docker-compose based setup includes:
 - C3
 
 ## Prerequisites
-see [Prerequisites](../README.md)
+see [Prerequisites](https://github.com/ora0600/confluent-rbac-hands-on)
 
 ## Image Versions
 We will use `PREFIX=confluentinc` and `TAG=5.4.1` for all images running via docker-compose. If you want to run newr docker images from Confluent, please change the `docker-compose.yml` file.
@@ -22,7 +22,7 @@ Start the demo environment on your local machine
 git clone https://github.com/ora0600/confluent-rbac-hands-on.git
 ./confluent-start.sh
 ```
-Doing hands-on see [Start-Page](../Readme.md)
+Doing hands-on see [Start-Page](https://github.com/ora0600/confluent-rbac-hands-on)
 
 To stop docker-compose setup:
 ```

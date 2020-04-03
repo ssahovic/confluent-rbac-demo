@@ -60,4 +60,4 @@ you should see
 
 All Labs are finished.
 
-go back to [to Lab Overview](../../Readme.md)
+go back to [to Lab Overview](https://github.com/ora0600/confluent-rbac-hands-on)

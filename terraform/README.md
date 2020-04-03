@@ -13,7 +13,7 @@ This docker-compose based setup includes:
 
 ## Prerequisites
 
-see [Prerequisites](../README.md)
+see [Prerequisites](https://github.com/ora0600/confluent-rbac-hands-on)
 
 ## Getting Started
 Before executing terraform for lab-environment deployment, change the [variables.tf](aws/variables.tf) with your aws_access_key and aws_secret_key. As well your own SSK key shoudl be used. see ssh_key_name.
@@ -45,7 +45,7 @@ ssh -i ~/keys/hackathon-temp-key.pem ec2-user@pubip
 cd /home/ec2-user/software/confluent-rbac-hands-on-master/rbac-docker
 ./confluent-start.sh
 ```
-Doing hands-on see [Start-Page](../Readme.md)
+Doing hands-on see [Start-Page](https://github.com/ora0600/confluent-rbac-hands-on)
 
 To stop docker-compose setup:
 ```bash

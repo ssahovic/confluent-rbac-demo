@@ -14,7 +14,7 @@ This docker-compose based setup includes:
 
 ## Prerequisites
 
-see [Prerequisites](../../README.md)
+see [Prerequisites](https://github.com/ora0600/confluent-rbac-hands-on)
 
 ## Getting Started
 To start confluent platform 5.3.1 including setup for RBC demo in AWS run
@@ -40,7 +40,7 @@ SSH =  SSH  Access: ssh -i ~/keys/hackathon-temp-key.pem ec2-user@pubip
 ZOOKEEPER =  --zookeeper pubip:2181
 ```
 
-Doing hands-on see [Start-Page](../Readme.md)
+Doing hands-on see [Start-Page](https://github.com/ora0600/confluent-rbac-hands-on)
 
 To stop docker-compose setup:
 ```
